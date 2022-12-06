@@ -15,3 +15,14 @@
       io/resource
       slurp
       str/split-lines))
+
+
+(defn dbg
+  [value]
+  (println value)
+  value)
+
+(defn dbgv
+  [value]
+  (println (type value))
+  value)
