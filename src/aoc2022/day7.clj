@@ -2,57 +2,61 @@
   (:require [clojure.string :as str])
   (:require [aoc2022.util :as util]))
 
-(defn combine-dir
-  [path name]
-  (let [full-path (str path (if (and (not= (first name) \/) (not= (last path) \/)) "/" "") name)] 
-    full-path))
+(defn update-path
+  [pwd cd-command]
+  (case cd-command
+    "/" ["/"]
+    ".." (vec (pop pwd))
+    (vec (conj pwd cd-command))))
+
+(defn line->file
+  [[size name]]
+  {:name name
+   :dir (= size "dir")
+   :size (if (= size "dir") 0 (util/str->int size))})
 
 (defn parse-line
   [tree lines pwd]
-  (if (empty? lines) tree 
+  (if (empty? lines) tree
       (let [parse-line #(str/split % #" ")
-            next-input (parse-line (first lines))
-            rest-input (rest lines)]
-        (if (= "$" (first next-input))
-          (case (second next-input)
-            "cd" (recur tree
-                        rest-input
-                        (let [dir (nth next-input 2)]
-                                          (if (= dir "..")
-                                            (get-in tree [pwd :up])
-                                            (combine-dir pwd dir))))
-            "ls" (let [result (take-while #(not= \$ (first %)) rest-input)
-                       result-lines (map parse-line result)
-                       files (reduce (fn [resulttree item]
-                                       (conj resulttree
-                                             {:name (combine-dir pwd (second item)) :up pwd :dir (= (first item) "dir") :size (if (= (first item) "dir") 0 (util/str->int (first item)))}))
-                                     [] result-lines)]
-                   (recur (reduce (fn [tree item]
-                                    (assoc tree (get item :name) item))
-                                  (assoc-in tree [pwd :children] (map :name files)) files)
-                          (drop (count files) rest-input) pwd)))
-          (recur tree rest-input pwd)))))
+            [prefix command & input] (parse-line (first lines))
+            rest-of-input (rest lines)]
+        (if (= "$" prefix)
+          (case command
+            "cd" (recur tree rest-of-input (update-path pwd (first input)))
+            "ls"
+            (let [result-lines (take-while #(not= \$ (first %)) rest-of-input)
+                  result (map parse-line result-lines)
+                  files (map line->file result)
+                  with-children (assoc-in tree [pwd :children] (map :name files))
+                  with-new-files (reduce
+                                  (fn [tree item] (assoc tree (conj pwd (item :name)) item))
+                                  with-children files)]
+              (recur with-new-files (drop (count files) rest-of-input) pwd)))
+          (recur tree rest-of-input pwd)))))
 
 (defn update-size
   [tree node size]
   (update-in tree [node :size] #(if (nil? %) size (+ % size))))
 
 (defn update-sizes
+  "tree tree pop up"
   [tree]
-  (reduce (fn [tree pair]
-            (let [item (second pair)]
-              (loop [tree tree
-                     key (:up item)]
-                (if key (recur
-                         (update-size tree key (:size item))
-                         (get-in tree [key :up]))
-                    tree))
-              )) tree tree))
+  (reduce
+   (fn [tree [key item]]
+     (loop [tree tree
+            up (pop key)]
+       (if (empty? up)
+         tree
+         (recur
+          (update-size tree up (:size item))
+          (pop up)))))
+   tree tree))
 
 (defn part1
   [filename]
   (->> filename util/load-input
-       (#(parse-line {} % ""))
+       (#(parse-line {} % []))
        update-sizes
        (map second)
        (filter #(<= (:size %) 100000))
@@ -62,11 +66,11 @@
 
 (defn part2
   [filename]
-  (let [tree 
+  (let [tree
         (->> filename util/load-input
-             (#(parse-line {} % ""))
+             (#(parse-line {} % []))
              update-sizes)
-        root-size (get-in tree ["/" :size])
+        root-size (get-in tree [["/"] :size])
         free (- 70000000 root-size)
         needed (- 30000000 free)]
     (->> tree (map second)
@@ -76,9 +80,7 @@
          (map :size)
          (first))))
 
-
-(part1 "day7_example")
-(part1 "day7_input")
-(part2 "day7_example")
-(part2 "day7_input")
-
+(assert (= (part1 "day7_example") 95437))
+(assert (= (part1 "day7_input") 1648397))
+(assert (= (part2 "day7_example") 24933642))
+(assert (= (part2 "day7_input") 1815525))
