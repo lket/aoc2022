@@ -4,10 +4,6 @@
   (:require [clojure.pprint :as p])
   (:require [clojure.java.io :as io]))
 
-(defn kissa
-  [nimi]
-  (format "Kissa nimeltä %s on söpö!" nimi))
-
 (defn str->int [str] (Integer/parseInt str))
 
 (defn load-input
@@ -16,7 +12,6 @@
       io/resource
       slurp
       str/split-lines))
-
 
 (defn dbg
   [value]
@@ -32,5 +27,3 @@
   [form]
   (println form)
   form)
-
-(dbgf (+ 1 1))

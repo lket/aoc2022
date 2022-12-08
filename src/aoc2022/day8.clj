@@ -4,11 +4,11 @@
 
 (defn transpose
   [matrix]
-  (vec (apply map list matrix)))
+  (apply mapv vector matrix))
 
 (defn parse-row
   [line]
-  (vec (map #(Character/digit % 10) line)))
+  (mapv #(Character/digit % 10) line))
 
 (defn is-visible
   [row rowr x]
@@ -32,20 +32,21 @@
 (defn matrix-loop
   [fun combiner data]
   (let [cols (transpose data)]
-    (for [x (range 0 (count (first data)))
-          y (range 0 (count data))]
+    (for [y (range 0 (count data))]
       (let [row (nth data y)
-            rowr (reverse row)
-            col (nth cols x)
-            colr (reverse col)]
-        (future (combiner (fun row rowr x) (fun col colr y)))))))
+            rowr (rseq row)]
+        (for [x (range 0 (count (first data)))]
+          (let [col (nth cols x)
+                colr (rseq col)]
+            (combiner (fun row rowr x) (fun col colr y))))))))
 
 (defn part1
   [filename]
   (->> filename util/load-input
        (map parse-row)
        (matrix-loop is-visible #(or %1 %2))
-       (filter deref)
+       (apply concat)
+       (filter identity)
        count))
 
 (defn part2
@@ -53,7 +54,7 @@
   (->> filename util/load-input
        (map parse-row)
        (matrix-loop scenic-score *)
-       (map deref)
+       (apply concat)
        (apply max)))
 
 (assert (part1 "day8_example") 21)
