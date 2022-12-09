@@ -60,18 +60,13 @@
 
 (defn handle-movement
   [state dir]
-  (let [headmoved (move state dir :head)]
-    (add-visited (tail-follow headmoved [:head] [:tail 0]) [:tail 0])))
-
-(defn handle-movement-long
-  [state dir]
-  (let [headmoved (move state dir :head)]
-    (add-visited (reduce
-                  (fn [state tail-n]
-                           (let [follow (if (zero? tail-n) [:head] [:tail (dec tail-n)])]
-                             (tail-follow state follow [:tail tail-n])))
-                  headmoved (range 0 9))
-                 [:tail 8])))
+  (let [headmoved (move state dir :head)
+        tailmoved (reduce (fn [state tail-n]
+                            (let [follow (if (zero? tail-n) [:head] [:tail (dec tail-n)])]
+                              (tail-follow state follow [:tail tail-n])))
+                          headmoved
+                          (range 0 (count (:tail headmoved))))]
+    (add-visited tailmoved [:tail 8])))
 
 (defn part1
   [filename]
@@ -85,7 +80,7 @@
   [filename]
   (->> filename util/load-input
        (mapcat parse-movement)
-       (reduce handle-movement-long state2)
+       (reduce handle-movement state2)
        :visited
        count))
 
