@@ -24,15 +24,15 @@
     [op args]))
 
 (defn cpu
-  [input state out]
+  [state in out]
   (go (>! out state)
-      (loop [input input
+      (loop [input (<! in)
              state state]
-        (if (seq input)
-          (let [state-stack (do-instruction state (first input))]
+        (if input
+          (let [state-stack (do-instruction state input)]
             (doseq [state state-stack]
               (>! out state))
-            (recur (rest input) (last state-stack)))
+            (recur (<! in) (last state-stack)))
           (a/close! out)))))
 
 (defn want-sycles
@@ -60,7 +60,8 @@
   [filename]
   (let [cpu-out (chan)
         input (->> filename util/load-input (map parse-line))
-        cpu-chan (cpu input initial-state cpu-out)
+        cpu-in (a/to-chan! input)
+        cpu-chan (cpu initial-state cpu-in cpu-out)
         record (<!! (a/into [] cpu-out))
         time (count record)
         cycles (map
@@ -74,7 +75,8 @@
   [filename]
   (let [cpu-out (chan)
         input (->> filename util/load-input (map parse-line))
-        cpu-chan (cpu input initial-state cpu-out)
+        cpu-in (a/to-chan! input)
+        cpu-chan (cpu initial-state cpu-in cpu-out)
         monitor-chan (monitor cpu-out 40 6)]
     (<!! monitor-chan)))
 
