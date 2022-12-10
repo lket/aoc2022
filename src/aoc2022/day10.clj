@@ -46,10 +46,10 @@
             line 0
             output ""]
     (if (>= line height) output
-        (if-let [sprite-x (<! input)]
-          (let [sprite? (>= 1 (abs (- (:x sprite-x) cursor)))
+        (if-let [sprite-x (:x (<! input))]
+          (let [sprite? (>= 1 (abs (- sprite-x cursor)))
                 pixel (if sprite? \# \.)
-                newline? (>= (inc cursor) 40)]
+                newline? (>= cursor 39)]
             (recur
              (mod (inc cursor) 40)
              (if newline? (inc line) line)
@@ -98,4 +98,3 @@
 #....#..#.#..#.#..#.#..#.#....#..#.#....
 ####..##..###..#..#..##..#.....##..####.
 "))
-
