@@ -9,27 +9,27 @@
 (defn parse-monkey
   [lines]
   (let [monkey (str/join \newline lines)
-        edn (-> monkey
+        data (-> monkey
                 (str/replace #"Monkey (\d):" "{ :id $1")
                 (str/replace #"Starting items: (.+)\n" ":items [$1]")
                 (str/replace #"Operation: new = (.+)\n" ":op (fn [old] (infix $1))")
                 (str/replace #"Test: divisible by (\d+)\n" ":test $1")
                 (str/replace #"If true: throw to monkey (\d)\n" ":true $1")
                 (str/replace #"If false: throw to monkey (\d)" ":false $1 :handled 0 }"))
-        data (clojure.edn/read-string edn)]
-    (update data :op eval)))
+        code (read-string data)]
+    (eval code)))
 
 (defn eval-monkey
   [monkey]
   (let [item (first (:items monkey))
         new-monkey (-> monkey
-                       (assoc :items (vec (rest (:items monkey))))
+                       (update :items (comp vec rest))
                        (update :handled inc))
         op (:op monkey)
         test (:test monkey)
         op-result (op item)
         ;; part1:
-        ;; worry int (/ op-result 3))
+        ;; worry (int (/ op-result 3))
         ;; part2:
         worry (mod (bigint op-result) (:common monkey))
         test-result (= (mod worry test) 0)]
