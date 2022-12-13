@@ -41,8 +41,8 @@
        (keep-indexed (fn [i val] (when (some #(= val %) [[[2]] [[6]]]) (inc i))))
        (apply *)))
 
-(assert (= (part1 "day13_example") 13))
-(assert (= (part1 "day13_input") 5720))
-(assert (= (part2 "day13_example") 140))
-(assert (= (part2 "day13_input") 23504))
+(util/varmista part1 day13_example 13)
+(util/varmista part1 day13_input   5720)
+(util/varmista part2 day13_example 140)
+(util/varmista part2 day13_input   23504)
 

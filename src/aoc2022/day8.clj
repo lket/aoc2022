@@ -1,6 +1,7 @@
 (ns aoc2022.day8
-  (:require [clojure.string :as str])
-  (:require [aoc2022.util :as util]))
+  (:require [clojure.string :as str]
+            [clojure.test :refer :all]
+            [aoc2022.util :as util]))
 
 (defn transpose
   [matrix]
@@ -11,23 +12,25 @@
   (mapv #(Character/digit % 10) line))
 
 (defn is-visible
-  [row rowr x]
+  [row _ x]
   (let [val (nth row x)
-        watch #(some (partial < val) (take x %))]
-    (not (and (watch row) (watch rowr)))))
+        watch_left #(some (partial <= val) (take x %))
+        watch_right #(some (partial <= val) (drop (inc x) %))]
+    (not (and (watch_left row) (watch_right row)))))
 
 (defn can-see
   [stack height n]
   (if (empty? stack) n
       (let [n (inc n)]
-        (if (>= (first stack) height) n
-            (recur (rest stack) height n)))))
+        (if (>= (peek stack) height) n
+            (recur (pop stack) height n)))))
 
 (defn scenic-score
   [row rowr x]
   (let [val (nth row x)
-        watch #(can-see (take x %) val 0)]
-    (* (watch row) (watch rowr))))
+        watch-left #(can-see (vec (take x %)) val 0)
+        watch-right #(can-see (vec (take (- (count %) x 1) %)) val 0)]
+    (* (watch-left row) (watch-right rowr))))
 
 (defn matrix-loop
   [fun combiner data]
@@ -57,7 +60,8 @@
        (apply concat)
        (apply max)))
 
-(assert (part1 "day8_example") 21)
-(assert (part1 "day8_input") 1705)
-(assert (part2 "day8_example") 8)
-(assert (part2 "day8_input") 371200)
+(util/varmista part1 day8_example 21)
+(util/varmista part1 day8_input 1705)
+(util/varmista part2 day8_example 8)
+(util/varmista part2 day8_input 371200)
+

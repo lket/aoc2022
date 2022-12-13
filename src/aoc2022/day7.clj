@@ -1,6 +1,6 @@
 (ns aoc2022.day7
-  (:require [clojure.string :as str])
-  (:require [aoc2022.util :as util]))
+  (:require [clojure.string :as str]
+            [aoc2022.util :as util]))
 
 (defn update-path
   [pwd cd-command]
@@ -80,7 +80,7 @@
          (map :size)
          (first))))
 
-(assert (= (part1 "day7_example") 95437))
-(assert (= (part1 "day7_input") 1648397))
-(assert (= (part2 "day7_example") 24933642))
-(assert (= (part2 "day7_input") 1815525))
+(util/varmista part1 day7_example 95437)
+(util/varmista part1 day7_input 1648397)
+(util/varmista part2 day7_example 24933642)
+(util/varmista part2 day7_input 1815525)

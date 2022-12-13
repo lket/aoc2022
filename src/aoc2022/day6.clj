@@ -1,6 +1,6 @@
 (ns aoc2022.day6
-  (:require [clojure.string :as str])
-  (:require [aoc2022.util :as util]))
+  (:require [clojure.string :as str]
+            [aoc2022.util :as util]))
 
 (defn find-packet
   [stream n buffer window]
@@ -25,5 +25,5 @@
       vec
       (find-packet 0 [] 14)))
 
-(part1 "day6_input")
-(part2 "day6_input")
+(util/varmista part1 day6_input 1531)
+(util/varmista part2 day6_input 2518)

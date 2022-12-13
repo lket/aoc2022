@@ -68,4 +68,4 @@
          (take-last 2)
          (apply *))))
 
-(assert (= (solve "day11_input") 11309046332))
+(util/varmista solve day11_input 11309046332)

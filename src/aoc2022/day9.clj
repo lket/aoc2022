@@ -1,6 +1,7 @@
 (ns aoc2022.day9
-  (:require [clojure.string :as str])
-  (:require [aoc2022.util :as util]))
+  (:require [clojure.string :as str]
+            [clojure.test :refer :all]
+            [aoc2022.util :as util]))
 
 (def state1
   {:head {:x 0 :y 0}
@@ -82,8 +83,9 @@
   [filename]
   (solve filename state2))
 
-(assert (= (part1 "day9_input") 5930))
-(assert (= (part1 "day9_example") 13))
-(assert (= (part2 "day9_example") 1))
-(assert (= (part2 "day9_example_long") 36))
-(assert (= (part2 "day9_input") 2443))
+(util/varmista part1 day9_input 5930)
+(util/varmista part1 day9_example 13)
+(util/varmista part2 day9_example 1)
+(util/varmista part2 day9_example_long 36)
+(util/varmista part2 day9_input 2443)
+
