@@ -19,9 +19,7 @@
     [[& _] [& _]] (check-list i1 i2 r1 r2)
     [_     [& _]] (check-list [i1] i2 r1 r2)
     [[& _] _    ] (check-list i1 [i2] r1 r2)
-    [_     _    ] (cond (< i1 i2) true
-                        (> i1 i2) false
-                        (= i1 i2) (recur r1 r2))))
+    [_     _    ] (if (= i1 i2) (recur r1 r2) (< i1 i2))))
 
 (defn part1
   [filename]
