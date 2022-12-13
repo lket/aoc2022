@@ -45,4 +45,3 @@
 (util/varmista part1 day13_input   5720)
 (util/varmista part2 day13_example 140)
 (util/varmista part2 day13_input   23504)
-

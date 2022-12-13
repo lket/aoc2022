@@ -32,5 +32,8 @@
   form)
 
 (defmacro varmista
-  [f nimi pitäisi]
-  `(assert (= (~f ~(str nimi)) ~pitäisi)))
+  ([f nimi] `(~f ~(str nimi)))
+  ([f nimi pitäisi]
+   `(let [tulos# (~f ~(str nimi))]
+      (assert (= tulos# ~pitäisi))
+      :ok!)))
