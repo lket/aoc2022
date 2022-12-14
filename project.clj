@@ -6,5 +6,7 @@
   :dependencies [[org.clojure/clojure "1.11.1"]
                  [org.clojure/core.match "1.0.0"]
                  [org.clojure/core.async "1.6.673"]
+                 [com.clojure-goes-fast/clj-async-profiler "1.0.3"]
                  [com.taoensso/tufte "2.4.5"]]
+  :jvm-opts ["-Djdk.attach.allowAttachSelf"]
   :repl-options {:init-ns aoc2022.core})
